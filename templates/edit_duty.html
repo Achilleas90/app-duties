@@ -43,6 +43,13 @@
       text-align: right;
       margin-top: 1em;
     }
+    .ts-control, .ts-dropdown {
+  min-width: 320px !important; /* Or larger if your names/ranks are long */
+  font-size: 1.08em;
+}
+    #staff-select {
+  min-width: 320px;
+}
   </style>
 </head>
 <body>
@@ -62,14 +69,18 @@
   <label> Τιμητική; </label>
     <input type="checkbox" name="honorary" {% if duty and duty.honorary %}checked{% endif %}>
 </div>
-      <div class="form-row">
-        <label>Στέλεχος:</label>
-        <select name="staff_id">
-          {% for s in staff_list %}
-            <option value="{{ s.id }}" {% if s.id == duty.staff_id %}selected{% endif %}>{{ s.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
+<div class="form-row">
+  <label>Στέλεχος:</label>
+  <select id="staff-select" name="staff_id" required>
+    <option value="">Επιλογή στελέχους...</option>
+    {% for s in staff %}
+      <option value="{{ s.id }}"
+        {% if selected_staff_id == s.id %}selected{% endif %}>
+        {{ s.rank }} {{ s.name }}
+      </option>
+    {% endfor %}
+  </select>
+</div>
       <div class="form-row">
         <label>Εγκρίθηκε;</label>
         <input type="checkbox" name="day_off_given" {% if duty.day_off_given %}checked{% endif %}>
@@ -104,6 +115,16 @@ flatpickr('.date-picker', {
       instance.clear();
     }
   }
+});
+</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='tomselect/tom-select.default.min.css') }}">
+<script src="{{ url_for('static', filename='tomselect/tom-select.complete.min.js') }}"></script>
+<script>
+new TomSelect("#staff-select", {
+    create: false,
+    sortField: {field: "text", direction: "asc"},
+    searchField: ["text"],
+    placeholder: "Αναζήτηση στελέχους…"
 });
 </script>
 
