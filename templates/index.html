@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Εκκρεμότητες</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    .navbar {
+      background: #234;
+      color: #fff;
+      padding: 0.5em 2em;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .navbar a {
+      color: #fff;
+      text-decoration: none;
+      margin-right: 2em;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+    .navbar a.active, .navbar a:hover { color: #fd0; }
+    .container {
+      max-width: 1200px;
+      margin: 2em auto;
+      background: #f4f4f8;
+      padding: 2em;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(30,40,60,0.07);
+    }
+    h1 { text-align: center; }
+    .list-block {
+      margin: 2em 0;
+      padding: 1em 2em;
+      background: #f7f7fa;
+      border-radius: 8px;
+    }
+    ul { list-style: none; padding-left: 0; }
+    li { margin-bottom: 0.6em; font-size: 1.08em; }
+    .pending { color: #e53; font-weight: bold; }
+    table th, table td {
+  padding: 1em 0.6em !important;  /* Top-bottom, then left-right */
+  vertical-align: middle;
+  font-size: 1.08em;
+}
+tr.pending-row { background: #fffde6; }
+tr.green-row { background: #e6ffe6; }
+
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="{{ url_for('index') }}" class="active">Εκκρεμότητες</a>
+    <a href="{{ url_for('duties') }}">Υπηρεσίες</a>
+    <a href="{{ url_for('staff') }}">Στελέχη</a>
+  </nav>
+  <div class="container">
+    <form method="get" style="margin-bottom:1em; text-align:center;">
+  <label for="order_by"><b>Ταξινόμηση κατά:</b></label>
+<select name="order_by" id="order_by" onchange="this.form.submit()" style="padding:0.3em 1em; border-radius:6px; border:1px solid #bcd; margin-right:1em;">
+  <option value="name" {% if order_by == 'name' %}selected{% endif %}>Όνομα</option>
+  <option value="rank" {% if order_by == 'rank' %}selected{% endif %}>Βαθμό</option>
+  <option value="pending" {% if order_by == 'pending' %}selected{% endif %}>Εκκρεμείς</option>
+  <option value="received" {% if order_by == 'received' %}selected{% endif %}>Ληφθείσες</option>
+</select>
+</form>
+
+<div class="list-block" style="margin: 2em auto; max-width:1200px;">
+  <h2 style="text-align:center;">Εκκρεμότητες Στελεχών</h2>
+  <table style="width:100%; border-collapse:collapse; background:#f7f7fa; border-radius:12px; overflow:hidden; box-shadow:0 2px 5px rgba(30,40,60,0.07);">
+  <thead>
+    <tr style="background:#234; color:#fff;">
+      <th style="text-align:left;">Βαθμός</th>
+      <th style="text-align:left;">Όνομα</th>
+      <th style="text-align:center;">Εκκρεμείς Απαλλαγές</th>
+      <th style="text-align:center;">Ληφθείσες απαλλαγές</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in staff %}
+      {% set pending = pending_days_off[s.id] %}
+      {% set received = received_days_off[s.id] %}
+      <tr style="background: {% if pending > 0 %}#fffde6{% else %}#e6ffe6{% endif %};">
+        <td>{{ s.rank }}</td>
+        <td>
+          <a href="{{ url_for('staff_duties', staff_id=s.id) }}" style="color:#234;font-weight:bold;text-decoration:underline;">
+            {{ s.name }}
+          </a>
+        </td>
+        <td style="text-align:center;">
+          <span class="pending" style="background:#fd0; color:#222; font-weight:bold; border-radius:8px; padding:0.2em 0.8em;">
+            {{ pending }}
+          </span>
+        </td>
+        <td style="text-align:center;">
+          <span class="received" style="background:#9f6; color:#222; font-weight:bold; border-radius:8px; padding:0.2em 0.8em;">
+            {{ received }}
+          </span>
+        </td>
+      </tr>
+    {% else %}
+      <tr>
+        <td colspan="4" style="text-align:center; padding:1em; color:#999;">
+          Κανένα στέλεχος με εκκρεμότητα.
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</div>
+
+</body>
+</html>

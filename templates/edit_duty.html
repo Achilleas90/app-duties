@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Επεξεργασία Υπηρεσίας</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    .navbar {
+      background: #234;
+      color: #fff;
+      padding: 0.5em 2em;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .navbar a {
+      color: #fff;
+      text-decoration: none;
+      margin-right: 2em;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+    .navbar a.active, .navbar a:hover { color: #fd0; }
+    .form-section {
+      max-width: 500px;
+      margin: 3em auto;
+      background: #f4f4f8;
+      padding: 2em;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(30,40,60,0.07);
+    }
+    h1 { text-align: center; }
+    .form-row {
+      margin-bottom: 1em;
+      display: flex;
+      gap: 1em;
+      align-items: center;
+    }
+    label { min-width: 120px; font-weight: 500; }
+    .btn-row {
+      text-align: right;
+      margin-top: 1em;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="{{ url_for('index') }}">Εκκρεμότητες</a>
+    <a href="{{ url_for('duties') }}">Υπηρεσίες</a>
+    <a href="{{ url_for('staff') }}">Στελέχη</a>
+  </nav>
+  <div class="form-section">
+    <h1>Επεξεργασία Υπηρεσίας</h1>
+    <form method="post">
+      <div class="form-row">
+        <label>Ημερομηνία:</label>
+        <input type="text" class="date-picker" name="duty_date" value="{{ date_ddmmyyyy(duty.duty_date) }}" required>
+      </div>
+            <div class="form-row">
+  <label> Τιμητική; </label>
+    <input type="checkbox" name="honorary" {% if duty and duty.honorary %}checked{% endif %}>
+</div>
+      <div class="form-row">
+        <label>Στέλεχος:</label>
+        <select name="staff_id">
+          {% for s in staff_list %}
+            <option value="{{ s.id }}" {% if s.id == duty.staff_id %}selected{% endif %}>{{ s.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Εγκρίθηκε;</label>
+        <input type="checkbox" name="day_off_given" {% if duty.day_off_given %}checked{% endif %}>
+      </div>
+      <div class="form-row">
+        <label>Ημερομηνία απαλλαγής:</label>
+        <input type="text" class="date-picker" name="day_off_date" value="{{ date_ddmmyyyy(duty.day_off_date) }}">
+      </div>
+      <div class="form-row">
+  <label>Περιγραφή:</label>
+  <textarea name="description" rows="2" style="min-width:250px;">{{ duty.description if duty else '' }}</textarea>
+</div>
+
+      <div class="btn-row">
+        <button type="submit">Αποθήκευση</button>
+        <a href="{{ url_for('duties') }}">Ακύρωση</a>
+      </div>
+    </form>
+  </div>
+  <link rel="stylesheet" href="{{ url_for('static', filename='flatpickr/flatpickr.min.css') }}">
+<script src="{{ url_for('static', filename='flatpickr/flatpickr.min.js') }}"></script>
+<script src="{{ url_for('static', filename='flatpickr/gr.js') }}"></script>
+<script>
+flatpickr('.date-picker', {
+  dateFormat: "d/m/Y",
+  locale: "gr",
+  allowInput: true,
+  onClose: function(selectedDates, dateStr, instance) {
+    const pattern = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (dateStr && !pattern.test(dateStr)) {
+      alert('Η ημερομηνία πρέπει να είναι μορφή ηη/μμ/εεεε');
+      instance.clear();
+    }
+  }
+});
+</script>
+
+
+</body>
+</html>
