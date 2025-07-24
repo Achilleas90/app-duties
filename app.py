@@ -83,7 +83,8 @@ def staff_duties(staff_id):
 @app.route('/duties')
 def duties():
     month = request.args.get('month')
-    staff = Staff.query.order_by(Staff.rank, Staff.name).all()
+    staff_list = Staff.query.order_by(Staff.rank, Staff.name).all()
+    staff = {s.id: s for s in staff_list}
 
     # Get all duties, or filter by selected month
     duties_query = Duty.query
