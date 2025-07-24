@@ -73,7 +73,7 @@
   <label>Στέλεχος:</label>
   <select id="staff-select" name="staff_id" required>
     <option value="">Επιλογή στελέχους...</option>
-    {% for s in staff %}
+    {% for s in staff_list %}
       <option value="{{ s.id }}"
         {% if selected_staff_id == s.id %}selected{% endif %}>
         {{ s.rank }} {{ s.name }}
