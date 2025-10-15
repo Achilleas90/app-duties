@@ -71,6 +71,18 @@ a:hover {
   box-shadow: var(--shadow-soft);
 }
 
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5em;
+  flex-wrap: wrap;
+}
+
+.panel-header .section-heading {
+  margin: 0;
+}
+
 .section-panel.compact {
   max-width: 500px;
 }
