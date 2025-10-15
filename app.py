@@ -121,6 +121,7 @@ def add_duty():
     staff_list = Staff.query.order_by(Staff.rank, Staff.name).all()
 
     if request.method == 'POST':
+        redirect_target: Optional[str] = request.form.get('next')
         duty_date_str = request.form['duty_date']
         staff_id = int(request.form['staff_id'])
         day_off_given = 'day_off_given' in request.form
@@ -143,13 +144,17 @@ def add_duty():
             description=description
         ))
         db.session.commit()
+        if redirect_target:
+            return redirect(redirect_target)
         return redirect(url_for('duties'))
 
-    selected_staff_id = request.args.get('staff_id')
+    selected_staff_id: Optional[str] = request.args.get('staff_id')
+    next_url: Optional[str] = request.args.get('next')
     return render_template(
         'add_duty.html',
         staff_list=staff_list,
-        selected_staff_id=selected_staff_id
+        selected_staff_id=selected_staff_id,
+        next_url=next_url
     )
 
 # Edit duty
@@ -181,8 +186,11 @@ def edit_duty(duty_id):
 @app.route('/delete_duty/<int:duty_id>', methods=['POST'])
 def delete_duty(duty_id):
     duty = Duty.query.get_or_404(duty_id)
+    redirect_target: Optional[str] = request.form.get('next')
     db.session.delete(duty)
     db.session.commit()
+    if redirect_target:
+        return redirect(redirect_target)
     return redirect(url_for('duties'))
 
 
