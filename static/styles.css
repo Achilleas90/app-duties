@@ -217,6 +217,15 @@ a:hover {
   flex-wrap: wrap;
 }
 
+.month-filter .button-primary {
+  padding: 0.35em 1.3em;
+}
+
+.month-filter .month-filter-clear {
+  margin-left: 0.75em;
+  white-space: nowrap;
+}
+
 .label-strong {
   font-weight: 600;
 }

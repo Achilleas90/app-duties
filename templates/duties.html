@@ -1,260 +1,166 @@
 <!doctype html>
 <html lang="el">
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
   <title>Υπηρεσίες</title>
-  <style>
-    body { margin: 0; font-family: sans-serif; }
-    .navbar {
-      background: #234;
-      color: #fff;
-      padding: 0.5em 2em;
-      display: flex;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .navbar a {
-      color: #fff;
-      text-decoration: none;
-      margin-right: 2em;
-      font-weight: bold;
-      transition: color 0.2s;
-    }
-    .navbar a.active, .navbar a:hover { color: #fd0; }
-    .duties-list { max-width: 1200px; margin: 2em auto; padding: 0; }
-    .duty-item {
-      display: flex;
-      align-items: center;
-      background: #f7f7fa;
-      border-radius: 8px;
-      margin-bottom: 1em;
-      padding: 0.5em 1em;
-      box-shadow: 0 1px 2px rgba(20,20,30,0.07);
-    }
-    .actions {
-      display: flex;
-      gap: 0.5em;
-      margin-right: 1em;
-    }
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0.3em;
-      display: inline-flex;
-      align-items: center;
-      transition: background 0.15s;
-    }
-    .icon-btn:hover {
-      background: #eef;
-      border-radius: 50%;
-    }
-    form.inline { display: inline; }
-    .duty-info {
-      flex: 1;
-      font-size: 1.05em;
-    }
-    /* Extra for the form */
-    .form-section {
-      max-width: 500px;
-      margin: 2em auto;
-      background: #f4f4f8;
-      padding: 1em 2em 2em 2em;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(30,40,60,0.07);
-    }
-    .form-row {
-      margin-bottom: 1em;
-      display: flex;
-      gap: 1em;
-      align-items: center;
-    }
-
-    label { min-width: 100px; font-weight: 500; }
-    .month-filter {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5em;
-  margin: 2em 0 1em 0;
-}
-@media (max-width: 600px) {
-  .month-filter {
-    flex-direction: column;
-    gap: 0.3em;
-  }
-}
-.ts-control, .ts-dropdown {
-  min-width: 320px !important; /* Or larger if your names/ranks are long */
-  font-size: 1.08em;
-}
-#staff-select {
-  min-width: 320px;
-}
-tr.pending-row { background: #fffde6; }
-tr.green-row { background: #e6ffe6; }
-
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='flatpickr/flatpickr.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='tomselect/tom-select.default.min.css') }}">
 </head>
 <body>
   <nav class="navbar">
-    <a href="{{ url_for('index') }}">Εκκρεμότητες</a>
-    <a href="{{ url_for('duties') }}" class="active">Υπηρεσίες</a>
-    <a href="{{ url_for('staff') }}">Στελέχη</a>
+    <a href="{{ url_for('index') }}" class="navbar-link">Εκκρεμότητες</a>
+    <a href="{{ url_for('duties') }}" class="navbar-link is-active">Υπηρεσίες</a>
+    <a href="{{ url_for('staff') }}" class="navbar-link">Στελέχη</a>
   </nav>
-    <div class="form-section">
-    <h2>Καταχώρηση νέας υπηρεσίας</h2>
-    <form action="{{ url_for('add_duty') }}" method="post">
-      <div class="form-row">
-        <label>Ημερομηνία:</label>
-        <input type="text" class="date-picker" name="duty_date" pattern="\d{2}/\d{2}/\d{4}" required lang="en-GB">
-      </div>
-<div class="form-row">
-  <label>Στέλεχος:</label>
-  <select id="staff-select" name="staff_id" required>
-    <option value="">Επιλογή στελέχους...</option>
-    {% for s in staff_list %}
-      <option value="{{ s.id }}"
-        {% if selected_staff_id == s.id %}selected{% endif %}>
-        {{ s.rank }} {{ s.name }}
-      </option>
-    {% endfor %}
-  </select>
-</div>
 
-  <div class="form-row">
-  <label> Τιμητική; </label>
-    <input type="checkbox" name="honorary" {% if duty and duty.honorary %}checked{% endif %}>
-</div>
-      <div class="form-row">
-        <label>Εγκρίθηκε;</label>
-        <input type="checkbox" name="day_off_given">
-      </div>
-      <div class="form-row">
-        <label>Ημέρα απαλλαγής:</label>
-        <input type="text" class="date-picker" name="day_off_date" pattern="\d{2}/\d{2}/\d{4}" lang="el-GR">
-      </div>
-      <div class="form-row">
-  <label>Περιγραφή:</label>
-  <textarea name="description" rows="2" style="min-width:250px;">{{ duty.description if duty else '' }}</textarea>
-</div>
-      <button type="submit">Προσθήκη</button>
+  <div class="page-container">
+    <div class="section-panel compact">
+      <h2 class="section-heading">Καταχώρηση νέας υπηρεσίας</h2>
+      <form action="{{ url_for('add_duty') }}" method="post">
+        <div class="form-row">
+          <label for="duty_date" class="form-label">Ημερομηνία:</label>
+          <input type="text" id="duty_date" class="input-control date-picker" name="duty_date" pattern="\d{2}/\d{2}/\d{4}" required lang="en-GB" value="{{ request.form.get('duty_date', '') }}">
+        </div>
+        {% if selected_staff_id is defined %}
+          {% set current_staff_id = selected_staff_id|string %}
+        {% else %}
+          {% set current_staff_id = request.form.get('staff_id') %}
+        {% endif %}
+        <div class="form-row">
+          <label for="staff-select" class="form-label">Στέλεχος:</label>
+          <select id="staff-select" class="select-control" name="staff_id" required>
+            <option value="">Επιλογή στελέχους...</option>
+            {% for s in staff_list %}
+              <option value="{{ s.id }}" {% if current_staff_id == (s.id|string) %}selected{% endif %}>
+                {{ s.rank }} {{ s.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="honorary" class="form-label">Τιμητική;</label>
+          <input type="checkbox" id="honorary" name="honorary" {% if request.form.get('honorary') %}checked{% endif %}>
+        </div>
+        <div class="form-row">
+          <label for="day_off_given" class="form-label">Εγκρίθηκε;</label>
+          <input type="checkbox" id="day_off_given" name="day_off_given" {% if request.form.get('day_off_given') %}checked{% endif %}>
+        </div>
+        <div class="form-row">
+          <label for="day_off_date" class="form-label">Ημέρα απαλλαγής:</label>
+          <input type="text" id="day_off_date" class="input-control date-picker" name="day_off_date" pattern="\d{2}/\d{2}/\d{4}" lang="el-GR" value="{{ request.form.get('day_off_date', '') }}">
+        </div>
+        <div class="form-row">
+          <label for="description" class="form-label">Περιγραφή:</label>
+          <textarea id="description" class="text-area" name="description" rows="2">{{ request.form.get('description', '') }}</textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="button-primary">Προσθήκη</button>
+        </div>
+      </form>
+    </div>
+
+    <form method="get" class="month-filter">
+      <label for="month" class="label-strong">Επιλογή Μήνα:</label>
+      <select name="month" id="month" class="select-control">
+        <option value="">Όλοι</option>
+        {% for value, label in months %}
+          <option value="{{ value }}" {% if selected_month == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="button-primary">Εμφάνιση</button>
+      {% if selected_month %}
+        <a href="{{ url_for('duties') }}" class="link-danger month-filter-clear">Κατάργηση φίλτρου</a>
+      {% endif %}
     </form>
+
+    <div class="table-panel">
+      <h2 class="section-heading">Υπηρεσίες</h2>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Ενέργειες</th>
+              <th>Ημερομηνία</th>
+              <th>Βαθμός</th>
+              <th>Στέλεχος</th>
+              <th class="is-centered">Απαλλαγή</th>
+              <th class="is-centered">Τιμητική</th>
+              <th>Περιγραφή</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in duties %}
+            <tr>
+              <td>
+                <div class="actions">
+                  <a class="icon-button" href="{{ url_for('edit_duty', duty_id=d.id) }}" title="Επεξεργασία">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13.85 3.15a2.1 2.1 0 0 1 2.97 2.97l-8.49 8.49a2 2 0 0 1-.71.45l-3.34 1.11a.5.5 0 0 1-.63-.63l1.11-3.34a2 2 0 0 1 .45-.71l8.49-8.49zM15.56 6.06l-1.62-1.62" stroke="#345" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </a>
+                  <form class="inline-form" action="{{ url_for('delete_duty', duty_id=d.id) }}" method="post" onsubmit="return confirm('Διαγραφή υπηρεσίας;');">
+                    <button class="icon-button" type="submit" title="Διαγραφή">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 6.5v9A1.5 1.5 0 0 0 6.5 17h7a1.5 1.5 0 0 0 1.5-1.5v-9M8.5 9v4M11.5 9v4M3 6.5h14M8 6.5V5.5A1.5 1.5 0 0 1 9.5 4h1A1.5 1.5 0 0 1 12 5.5v1" stroke="#c24" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </form>
+                </div>
+              </td>
+              <td>{{ greek_date_fmt(d.duty_date) }}</td>
+              <td>{{ staff[d.staff_id].rank }}</td>
+              <td>{{ staff[d.staff_id].name }}</td>
+              <td class="is-centered">
+                {% if d.day_off_given %}
+                  <span class="status-positive">&#10003; Ναι</span>
+                {% else %}
+                  <span class="status-negative">Όχι</span>
+                {% endif %}
+              </td>
+              <td class="is-centered">
+                {% if d.honorary %}
+                  <span class="status-honorary">Ναι</span>
+                {% else %}
+                  <span class="status-neutral">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if d.description %}
+                  <div class="duty-description">{{ d.description }}</div>
+                {% else %}
+                  <span class="status-neutral">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-<form method="get" class="month-filter">
-  <label for="month" style="font-weight: bold; margin-right:1em;">Επιλογή Μήνα:</label>
-  <select name="month" id="month" style="padding:0.3em 1em; border-radius:6px; border:1px solid #bcd; margin-right:1em;">
-    <option value="">Όλοι</option>
-    {% for value, label in months %}
-      <option value="{{ value }}" {% if selected_month == value %}selected{% endif %}>{{ label }}</option>
-    {% endfor %}
-  </select>
-  <button type="submit" style="padding:0.3em 1.3em; border-radius:6px; background:#234; color:#fff; border:none;">Εμφάνιση</button>
-  {% if selected_month %}
-    <a href="{{ url_for('duties') }}" style="margin-left: 1em; color: #e53; text-decoration: underline;">Κατάργηση φίλτρου</a>
-  {% endif %}
-</form>
 
-
-  <h1 style="text-align:center;">Υπηρεσίες</h1>
-  <div class="duties-list" style="overflow-x:auto;">
-  <table style="width:100%; border-collapse:collapse; background:#f7f7fa; border-radius:12px; box-shadow:0 1px 2px rgba(20,20,30,0.07);">
-    <thead>
-      <tr style="background:#234; color:#fff;">
-        <th style="padding: 1em 0.6em; text-align:left;">Ενέργειες</th>
-        <th style="padding: 1em 0.6em; text-align:left;">Ημερομηνία</th>
-        <th style="padding: 1em 0.6em; text-align:left;">Βαθμός</th>
-        <th style="padding: 1em 0.6em; text-align:left;">Στέλεχος</th>
-        <th style="padding: 1em 0.6em; text-align:left;">Απαλλαγή</th>
-        <th style="padding: 1em 0.6em; text-align:left;">Τιμητική</th>
-        <th style="padding: 1em 0.6em; text-align:left;">Περιγραφή</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for d in duties %}
-      <tr>
-        <!-- Actions -->
-        <td style="vertical-align: middle;">
-          <div class="actions">
-            <a class="icon-btn" href="{{ url_for('edit_duty', duty_id=d.id) }}" title="Επεξεργασία">
-              <!-- Pencil Icon -->
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13.85 3.15a2.1 2.1 0 0 1 2.97 2.97l-8.49 8.49a2 2 0 0 1-.71.45l-3.34 1.11a.5.5 0 0 1-.63-.63l1.11-3.34a2 2 0 0 1 .45-.71l8.49-8.49zM15.56 6.06l-1.62-1.62" stroke="#345" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-            <form class="inline" action="{{ url_for('delete_duty', duty_id=d.id) }}" method="post" onsubmit="return confirm('Διαγραφή υπηρεσίας;');">
-              <button class="icon-btn" type="submit" title="Διαγραφή">
-                <!-- Trash Icon -->
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 6.5v9A1.5 1.5 0 0 0 6.5 17h7a1.5 1.5 0 0 0 1.5-1.5v-9M8.5 9v4M11.5 9v4M3 6.5h14M8 6.5V5.5A1.5 1.5 0 0 1 9.5 4h1A1.5 1.5 0 0 1 12 5.5v1" stroke="#c24" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-            </form>
-          </div>
-        </td>
-        <!-- Date -->
-        <td>{{ greek_date_fmt(d.duty_date) }}</td>
-        <!-- Staff -->
-        <td>{{ staff[d.staff_id].rank }}</td>
-        <td>{{ staff[d.staff_id].name }}</td>
-        <!-- Approved Day Off -->
-        <td>
-          {% if d.day_off_given %}
-            <span style="color:#093; font-weight:bold;">&#10003; Ναι</span>
-          {% else %}
-            <span style="color:#8B0000;">Όχι</span>
-          {% endif %}
-        </td>
-        <!-- Honorary -->
-        <td>
-          {% if d.honorary %}
-            <span style="color:#8B8000; font-weight:bold;">Ναι</span>
-          {% else %}
-            <span style="color:#ccc;">—</span>
-          {% endif %}
-        </td>
-        <!-- Description -->
-        <td>
-          {% if d.description %}
-            <div class="duty-description" style="color:#347; font-style:italic;">
-              {{ d.description }}
-            </div>
-          {% else %}
-            <span style="color:#bbb;">—</span>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-
-  <link rel="stylesheet" href="{{ url_for('static', filename='flatpickr/flatpickr.min.css') }}">
-<script src="{{ url_for('static', filename='flatpickr/flatpickr.min.js') }}"></script>
-<script src="{{ url_for('static', filename='flatpickr/gr.js') }}"></script>
-<script>
-flatpickr('.date-picker', {
-  dateFormat: "d/m/Y",
-  locale: "gr",
-  allowInput: true,
-  onClose: function(selectedDates, dateStr, instance) {
-    const pattern = /^\d{2}\/\d{2}\/\d{4}$/;
-    if (dateStr && !pattern.test(dateStr)) {
-      alert('Η ημερομηνία πρέπει να είναι μορφή ηη/μμ/εεεε');
-      instance.clear();
+  <script src="{{ url_for('static', filename='flatpickr/flatpickr.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='flatpickr/gr.js') }}"></script>
+  <script>
+  flatpickr('.date-picker', {
+    dateFormat: "d/m/Y",
+    locale: "gr",
+    allowInput: true,
+    onClose: function(selectedDates, dateStr, instance) {
+      const pattern = /^\d{2}\/\d{2}\/\d{4}$/;
+      if (dateStr && !pattern.test(dateStr)) {
+        alert('Η ημερομηνία πρέπει να είναι μορφή ηη/μμ/εεεε');
+        instance.clear();
+      }
     }
-  }
-});
-</script>
+  });
+  </script>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='tomselect/tom-select.default.min.css') }}">
-<script src="{{ url_for('static', filename='tomselect/tom-select.complete.min.js') }}"></script>
-<script>
-new TomSelect("#staff-select", {
-    create: false,
-    sortField: {field: "text", direction: "asc"},
-    searchField: ["text"],
-    placeholder: "Αναζήτηση στελέχους…"
-});
-</script>
-
+  <script src="{{ url_for('static', filename='tomselect/tom-select.complete.min.js') }}"></script>
+  <script>
+  new TomSelect("#staff-select", {
+      create: false,
+      sortField: {field: "text", direction: "asc"},
+      searchField: ["text"],
+      placeholder: "Αναζήτηση στελέχους…"
+  });
+  </script>
 </body>
 </html>
