@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
 from datetime import datetime
+from typing import Optional
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///duty.db'
@@ -77,7 +78,7 @@ def staff_duties(staff_id):
         duties = sorted(duties, key=lambda d: (not d.honorary, d.duty_date))
     else:
         duties = sorted(duties, key=lambda d: d.duty_date)
-    return render_template('staff_duties.html', staff=staff_member, duties=duties)
+    return render_template('staff_duties.html', staff=staff_member, duties=duties, order_by=order_by)
 
 
 @app.route('/duties')
@@ -158,6 +159,7 @@ def edit_duty(duty_id):
     staff_list = Staff.query.order_by(Staff.rank, Staff.name).all()
     staff_dict = {s.id: s for s in staff_list}
     if request.method == 'POST':
+        next_url: Optional[str] = request.form.get('next')
         duty.duty_date = datetime.strptime(request.form['duty_date'], '%d/%m/%Y').date()
         duty.staff_id = int(request.form['staff_id'])
         duty.honorary = 'honorary' in request.form
@@ -169,8 +171,11 @@ def edit_duty(duty_id):
         else:
             duty.day_off_date = None
         db.session.commit()
+        if next_url:
+            return redirect(next_url)
         return redirect(url_for('duties'))
-    return render_template('edit_duty.html', duty=duty, staff=staff_dict, staff_list=staff_list, selected_staff_id=duty.staff_id)
+    next_url: Optional[str] = request.args.get('next')
+    return render_template('edit_duty.html', duty=duty, staff=staff_dict, staff_list=staff_list, selected_staff_id=duty.staff_id, next_url=next_url)
 
 # Delete duty
 @app.route('/delete_duty/<int:duty_id>', methods=['POST'])

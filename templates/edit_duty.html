@@ -16,6 +16,9 @@
   <div class="section-panel compact">
     <h1 class="section-heading">Επεξεργασία Υπηρεσίας</h1>
     <form method="post">
+      {% if next_url %}
+      <input type="hidden" name="next" value="{{ next_url }}">
+      {% endif %}
       <div class="form-row">
         <label for="duty_date" class="form-label">Ημερομηνία:</label>
         <input type="text" id="duty_date" class="input-control date-picker" name="duty_date" value="{{ date_ddmmyyyy(duty.duty_date) }}" pattern="\d{2}/\d{2}/\d{4}" required lang="en-GB">
@@ -50,7 +53,7 @@
       </div>
       <div class="form-actions">
         <button type="submit" class="button-primary">Αποθήκευση</button>
-        <a href="{{ url_for('duties') }}" class="button-secondary">Ακύρωση</a>
+        <a href="{{ next_url if next_url else url_for('duties') }}" class="button-secondary">Ακύρωση</a>
       </div>
     </form>
   </div>

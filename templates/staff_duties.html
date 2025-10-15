@@ -39,7 +39,7 @@
           <tr>
             <td>
               <div class="actions">
-                <a class="icon-button" href="{{ url_for('edit_duty', duty_id=d.id) }}" title="Επεξεργασία">
+                <a class="icon-button" href="{{ url_for('edit_duty', duty_id=d.id, next=url_for('staff_duties', staff_id=staff.id, order_by=order_by)) }}" title="Επεξεργασία">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13.85 3.15a2.1 2.1 0 0 1 2.97 2.97l-8.49 8.49a2 2 0 0 1-.71.45l-3.34 1.11a.5.5 0 0 1-.63-.63l1.11-3.34a2 2 0 0 1 .45-.71l8.49-8.49zM15.56 6.06l-1.62-1.62" stroke="#345" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
               </div>
