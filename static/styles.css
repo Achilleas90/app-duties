@@ -89,6 +89,20 @@ a:hover {
   box-shadow: var(--shadow-compact);
 }
 
+.table-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+  flex-wrap: wrap;
+  margin-bottom: 1.5em;
+}
+
+.table-panel-header .section-heading {
+  margin: 0;
+  text-align: left;
+}
+
 .list-block ul {
   list-style: none;
   margin: 0;

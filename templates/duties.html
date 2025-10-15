@@ -15,51 +15,6 @@
   </nav>
 
   <div class="page-container">
-    <div class="section-panel compact">
-      <h2 class="section-heading">Καταχώρηση νέας υπηρεσίας</h2>
-      <form action="{{ url_for('add_duty') }}" method="post">
-        <div class="form-row">
-          <label for="duty_date" class="form-label">Ημερομηνία:</label>
-          <input type="text" id="duty_date" class="input-control date-picker" name="duty_date" pattern="\d{2}/\d{2}/\d{4}" required lang="en-GB" value="{{ request.form.get('duty_date', '') }}">
-        </div>
-        {% if selected_staff_id is defined %}
-          {% set current_staff_id = selected_staff_id|string %}
-        {% else %}
-          {% set current_staff_id = request.form.get('staff_id') %}
-        {% endif %}
-        <div class="form-row">
-          <label for="staff-select" class="form-label">Στέλεχος:</label>
-          <select id="staff-select" class="select-control" name="staff_id" required>
-            <option value="">Επιλογή στελέχους...</option>
-            {% for s in staff_list %}
-              <option value="{{ s.id }}" {% if current_staff_id == (s.id|string) %}selected{% endif %}>
-                {{ s.rank }} {{ s.name }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="form-row">
-          <label for="honorary" class="form-label">Τιμητική;</label>
-          <input type="checkbox" id="honorary" name="honorary" {% if request.form.get('honorary') %}checked{% endif %}>
-        </div>
-        <div class="form-row">
-          <label for="day_off_given" class="form-label">Εγκρίθηκε;</label>
-          <input type="checkbox" id="day_off_given" name="day_off_given" {% if request.form.get('day_off_given') %}checked{% endif %}>
-        </div>
-        <div class="form-row">
-          <label for="day_off_date" class="form-label">Ημέρα απαλλαγής:</label>
-          <input type="text" id="day_off_date" class="input-control date-picker" name="day_off_date" pattern="\d{2}/\d{2}/\d{4}" lang="el-GR" value="{{ request.form.get('day_off_date', '') }}">
-        </div>
-        <div class="form-row">
-          <label for="description" class="form-label">Περιγραφή:</label>
-          <textarea id="description" class="text-area" name="description" rows="2">{{ request.form.get('description', '') }}</textarea>
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="button-primary">Προσθήκη</button>
-        </div>
-      </form>
-    </div>
-
     <form method="get" class="month-filter">
       <label for="month" class="label-strong">Επιλογή Μήνα:</label>
       <select name="month" id="month" class="select-control">
@@ -75,7 +30,10 @@
     </form>
 
     <div class="table-panel">
-      <h2 class="section-heading">Υπηρεσίες</h2>
+      <div class="table-panel-header">
+        <h2 class="section-heading">Υπηρεσίες</h2>
+        <a href="{{ url_for('add_duty') }}" class="button-primary">Νέα υπηρεσία</a>
+      </div>
       <div class="table-wrapper">
         <table class="data-table">
           <thead>
@@ -136,31 +94,5 @@
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='flatpickr/flatpickr.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='flatpickr/gr.js') }}"></script>
-  <script>
-  flatpickr('.date-picker', {
-    dateFormat: "d/m/Y",
-    locale: "gr",
-    allowInput: true,
-    onClose: function(selectedDates, dateStr, instance) {
-      const pattern = /^\d{2}\/\d{2}\/\d{4}$/;
-      if (dateStr && !pattern.test(dateStr)) {
-        alert('Η ημερομηνία πρέπει να είναι μορφή ηη/μμ/εεεε');
-        instance.clear();
-      }
-    }
-  });
-  </script>
-
-  <script src="{{ url_for('static', filename='tomselect/tom-select.complete.min.js') }}"></script>
-  <script>
-  new TomSelect("#staff-select", {
-      create: false,
-      sortField: {field: "text", direction: "asc"},
-      searchField: ["text"],
-      placeholder: "Αναζήτηση στελέχους…"
-  });
-  </script>
 </body>
 </html>
