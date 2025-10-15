@@ -110,37 +110,46 @@ def duties():
         'duties.html',
         duties=duties,
         staff=staff_dict,
-        staff_list=staff_list,
         months=months,
         selected_month=month
     )
 
 
-@app.route('/add_duty', methods=['POST'])
+@app.route('/add_duty', methods=['GET', 'POST'])
 def add_duty():
-    duty_date_str = request.form['duty_date']
-    staff_id = request.form['staff_id']
-    day_off_given = 'day_off_given' in request.form
-    day_off_date_str = request.form.get('day_off_date') or None
-    honorary = 'honorary' in request.form
-    description = request.form.get('description', '').strip()
+    staff_list = Staff.query.order_by(Staff.rank, Staff.name).all()
 
-    # Convert strings to date objects
-    duty_date = datetime.strptime(duty_date_str, '%d/%m/%Y').date()
-    day_off_date = None
-    if day_off_date_str:
-        day_off_date = datetime.strptime(day_off_date_str, '%d/%m/%Y').date()
+    if request.method == 'POST':
+        duty_date_str = request.form['duty_date']
+        staff_id = int(request.form['staff_id'])
+        day_off_given = 'day_off_given' in request.form
+        day_off_date_str = request.form.get('day_off_date') or None
+        honorary = 'honorary' in request.form
+        description = request.form.get('description', '').strip()
 
-    db.session.add(Duty(
-        duty_date=duty_date,
-        staff_id=staff_id,
-        day_off_given=day_off_given,
-        honorary=honorary,
-        day_off_date=day_off_date,
-        description=description
-    ))
-    db.session.commit()
-    return redirect(url_for('duties'))
+        # Convert strings to date objects
+        duty_date = datetime.strptime(duty_date_str, '%d/%m/%Y').date()
+        day_off_date = None
+        if day_off_date_str:
+            day_off_date = datetime.strptime(day_off_date_str, '%d/%m/%Y').date()
+
+        db.session.add(Duty(
+            duty_date=duty_date,
+            staff_id=staff_id,
+            day_off_given=day_off_given,
+            honorary=honorary,
+            day_off_date=day_off_date,
+            description=description
+        ))
+        db.session.commit()
+        return redirect(url_for('duties'))
+
+    selected_staff_id = request.args.get('staff_id')
+    return render_template(
+        'add_duty.html',
+        staff_list=staff_list,
+        selected_staff_id=selected_staff_id
+    )
 
 # Edit duty
 @app.route('/edit_duty/<int:duty_id>', methods=['GET', 'POST'])
