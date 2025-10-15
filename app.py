@@ -83,7 +83,8 @@ def staff_duties(staff_id):
 @app.route('/duties')
 def duties():
     month = request.args.get('month')
-    staff = Staff.query.order_by(Staff.rank, Staff.name).all()
+    staff_list = Staff.query.order_by(Staff.rank, Staff.name).all()
+    staff_dict = {s.id: s for s in staff_list}
 
     # Get all duties, or filter by selected month
     duties_query = Duty.query
@@ -108,7 +109,8 @@ def duties():
     return render_template(
         'duties.html',
         duties=duties,
-        staff=staff,
+        staff=staff_dict,
+        staff_list=staff_list,
         months=months,
         selected_month=month
     )
@@ -144,7 +146,8 @@ def add_duty():
 @app.route('/edit_duty/<int:duty_id>', methods=['GET', 'POST'])
 def edit_duty(duty_id):
     duty = Duty.query.get_or_404(duty_id)
-    staff = Staff.query.all()
+    staff_list = Staff.query.order_by(Staff.rank, Staff.name).all()
+    staff_dict = {s.id: s for s in staff_list}
     if request.method == 'POST':
         duty.duty_date = datetime.strptime(request.form['duty_date'], '%d/%m/%Y').date()
         duty.staff_id = int(request.form['staff_id'])
@@ -158,7 +161,7 @@ def edit_duty(duty_id):
             duty.day_off_date = None
         db.session.commit()
         return redirect(url_for('duties'))
-    return render_template('edit_duty.html', duty=duty, staff=staff)
+    return render_template('edit_duty.html', duty=duty, staff=staff_dict, staff_list=staff_list, selected_staff_id=duty.staff_id)
 
 # Delete duty
 @app.route('/delete_duty/<int:duty_id>', methods=['POST'])
