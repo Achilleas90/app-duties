@@ -3,68 +3,28 @@
 <head>
 <meta charset="UTF-8">
   <title>Επεξεργασία Στελέχους</title>
-  <style>
-    body { margin: 0; font-family: sans-serif; }
-    .navbar {
-      background: #234;
-      color: #fff;
-      padding: 0.5em 2em;
-      display: flex;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .navbar a {
-      color: #fff;
-      text-decoration: none;
-      margin-right: 2em;
-      font-weight: bold;
-      transition: color 0.2s;
-    }
-    .navbar a.active, .navbar a:hover { color: #fd0; }
-    .form-section {
-      max-width: 500px;
-      margin: 3em auto;
-      background: #f4f4f8;
-      padding: 2em;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(30,40,60,0.07);
-    }
-    h1 { text-align: center; }
-    .form-row {
-      margin-bottom: 1em;
-      display: flex;
-      gap: 1em;
-      align-items: center;
-    }
-    label { min-width: 100px; font-weight: 500; }
-    .btn-row {
-      text-align: right;
-      margin-top: 1em;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
   <nav class="navbar">
-    <a href="{{ url_for('index') }}">Εκκρεμότητες</a>
-    <a href="{{ url_for('duties') }}">Υπηρεσίες</a>
-    <a href="{{ url_for('staff') }}" class="active">Στελέχη</a>
+    <a href="{{ url_for('index') }}" class="navbar-link">Εκκρεμότητες</a>
+    <a href="{{ url_for('duties') }}" class="navbar-link">Υπηρεσίες</a>
+    <a href="{{ url_for('staff') }}" class="navbar-link is-active">Στελέχη</a>
   </nav>
-  <div class="form-section">
-    <h1>Επεξεργασία Στελέχους</h1>
+  <div class="section-panel compact">
+    <h1 class="section-heading">Επεξεργασία Στελέχους</h1>
     <form method="post">
       <div class="form-row">
-        <label>Όνομα:</label>
-        <input name="name" value="{{ staff.name }}" required>
+        <label class="form-label">Όνομα:</label>
+        <input name="name" value="{{ staff.name }}" required class="input-control">
       </div>
       <div class="form-row">
-        <label>Βαθμός:</label>
-        <input name="rank" value="{{ staff.rank }}">
+        <label class="form-label">Βαθμός:</label>
+        <input name="rank" value="{{ staff.rank }}" class="input-control">
       </div>
-      <div class="btn-row">
-        <button type="submit">Αποθήκευση</button>
-        <a href="{{ url_for('staff') }}">Ακύρωση</a>
+      <div class="form-actions">
+        <button type="submit" class="button-primary">Αποθήκευση</button>
+        <a href="{{ url_for('staff') }}" class="button-secondary">Ακύρωση</a>
       </div>
     </form>
   </div>

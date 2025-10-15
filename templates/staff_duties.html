@@ -3,50 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <title>Υπηρεσίες: {{ staff.name }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
-  <style>
-    body { margin: 0; font-family: sans-serif; }
-    .navbar { background: #234; color: #fff; padding: 0.5em 2em; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; }
-    .navbar a { color: #fff; text-decoration: none; margin-right: 2em; font-weight: bold; transition: color 0.2s; }
-    .navbar a.active, .navbar a:hover { color: #fd0; }
-    .container { max-width: 1000px; margin: 2em auto; background: #f4f4f8; padding: 2em; border-radius: 12px; box-shadow: 0 2px 5px rgba(30,40,60,0.07);}
-    h1 { text-align: center; }
-    .staff-duties-table { width: 100%; border-collapse: collapse; background: #f7f7fa; border-radius: 12px; box-shadow: 0 1px 2px rgba(20,20,30,0.07); min-width: 650px;}
-    .staff-duties-table th, .staff-duties-table td { padding: 1em 0.6em; text-align: left; vertical-align: middle; font-size: 1.07em;}
-    .staff-duties-table th { background: #234; color: #fff;}
-    .actions { display: flex; gap: 0.5em;}
-    .icon-btn { background: none; border: none; cursor: pointer; padding: 0.3em; display: inline-flex; align-items: center; transition: background 0.15s;}
-    .icon-btn:hover { background: #eef; border-radius: 50%;}
-    .duty-description { color:#347; font-style:italic;}
-    .return-link { color:#234; display: inline-block; margin-top:2em;}
-    .sort-form { text-align:center; margin-bottom:1em;}
-    @media (max-width: 700px) {
-      .container { max-width: 98vw; padding-left: 2vw; padding-right: 2vw;}
-      .staff-duties-table { min-width: 480px;}
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
   <nav class="navbar">
-    <a href="{{ url_for('index') }}">Εκκρεμότητες</a>
-    <a href="{{ url_for('duties') }}">Υπηρεσίες</a>
-    <a href="{{ url_for('staff') }}">Στελέχη</a>
+    <a href="{{ url_for('index') }}" class="navbar-link">Εκκρεμότητες</a>
+    <a href="{{ url_for('duties') }}" class="navbar-link">Υπηρεσίες</a>
+    <a href="{{ url_for('staff') }}" class="navbar-link">Στελέχη</a>
   </nav>
-  <div class="container">
-    <h1>Υπηρεσίες για{% if staff.rank %} {{ staff.rank }}{% endif %} {{ staff.name }}</h1>
+  <div class="section-panel">
+    <h1 class="section-heading">Υπηρεσίες για{% if staff.rank %} {{ staff.rank }}{% endif %} {{ staff.name }}</h1>
 
-    <!-- Sort Dropdown -->
     <form method="get" class="sort-form">
-      <label for="order_by"><b>Ταξινόμηση κατά:</b></label>
-      <select name="order_by" id="order_by" onchange="this.form.submit()" style="padding:0.3em 1em; border-radius:6px; border:1px solid #bcd; margin-right:1em;">
+      <label for="order_by" class="label-strong">Ταξινόμηση κατά:</label>
+      <select name="order_by" id="order_by" class="select-control" onchange="this.form.submit()">
         <option value="date" {% if order_by == 'date' %}selected{% endif %}>Ημερομηνία</option>
         <option value="off" {% if order_by == 'off' %}selected{% endif %}>Εγκρίθηκε</option>
         <option value="honorary" {% if order_by == 'honorary' %}selected{% endif %}>Τιμητική</option>
       </select>
     </form>
 
-    <div style="overflow-x:auto;">
-      <table class="staff-duties-table">
+    <div class="table-wrapper">
+      <table class="data-table">
         <thead>
           <tr>
             <th>Ενέργειες</th>
@@ -59,41 +37,33 @@
         <tbody>
           {% for d in duties %}
           <tr>
-            <!-- Actions -->
             <td>
               <div class="actions">
-                <a class="icon-btn" href="{{ url_for('edit_duty', duty_id=d.id) }}" title="Επεξεργασία">
-                  <!-- Pencil Icon -->
+                <a class="icon-button" href="{{ url_for('edit_duty', duty_id=d.id) }}" title="Επεξεργασία">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13.85 3.15a2.1 2.1 0 0 1 2.97 2.97l-8.49 8.49a2 2 0 0 1-.71.45l-3.34 1.11a.5.5 0 0 1-.63-.63l1.11-3.34a2 2 0 0 1 .45-.71l8.49-8.49zM15.56 6.06l-1.62-1.62" stroke="#345" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
               </div>
             </td>
-            <!-- Date -->
             <td>{{ greek_date_fmt(d.duty_date) }}</td>
-            <!-- Approved Day Off -->
-            <td>
+            <td class="is-centered">
               {% if d.day_off_given %}
-                <span style="color:#093; font-weight:bold;">&#10003; Ναι</span>
+                <span class="status-positive">&#10003; Ναι</span>
               {% else %}
-                <span style="color:#8B0000;">Όχι</span>
+                <span class="status-negative">Όχι</span>
               {% endif %}
             </td>
-            <!-- Honorary -->
-            <td>
+            <td class="is-centered">
               {% if d.honorary %}
-                <span style="color:#8B8000; font-weight:bold;">Ναι</span>
+                <span class="status-honorary">Ναι</span>
               {% else %}
-                <span style="color:#ccc;">—</span>
+                <span class="status-neutral">—</span>
               {% endif %}
             </td>
-            <!-- Description -->
             <td>
               {% if d.description %}
-                <div class="duty-description">
-                  {{ d.description }}
-                </div>
+                <div class="duty-description">{{ d.description }}</div>
               {% else %}
-                <span style="color:#bbb;">—</span>
+                <span class="status-neutral">—</span>
               {% endif %}
             </td>
           </tr>
@@ -101,8 +71,8 @@
         </tbody>
       </table>
     </div>
-    <div style="text-align:center; margin-top:2em;">
-      <a href="{{ url_for('staff') }}" class="return-link">&laquo; Επιστροφή στη λίστα στελεχών</a>
+    <div class="return-container">
+      <a href="{{ url_for('staff') }}" class="link-return">&laquo; Επιστροφή στη λίστα στελεχών</a>
     </div>
   </div>
 </body>
