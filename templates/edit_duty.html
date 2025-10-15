@@ -3,131 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <title>Επεξεργασία Υπηρεσίας</title>
-  <style>
-    body { margin: 0; font-family: sans-serif; }
-    .navbar {
-      background: #234;
-      color: #fff;
-      padding: 0.5em 2em;
-      display: flex;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .navbar a {
-      color: #fff;
-      text-decoration: none;
-      margin-right: 2em;
-      font-weight: bold;
-      transition: color 0.2s;
-    }
-    .navbar a.active, .navbar a:hover { color: #fd0; }
-    .form-section {
-      max-width: 500px;
-      margin: 3em auto;
-      background: #f4f4f8;
-      padding: 2em;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(30,40,60,0.07);
-    }
-    h1 { text-align: center; }
-    .form-row {
-      margin-bottom: 1em;
-      display: flex;
-      gap: 1em;
-      align-items: center;
-    }
-    label { min-width: 120px; font-weight: 500; }
-    .btn-row {
-      text-align: right;
-      margin-top: 1em;
-    }
-    .ts-control, .ts-dropdown {
-  min-width: 320px !important; /* Or larger if your names/ranks are long */
-  font-size: 1.08em;
-}
-    #staff-select {
-  min-width: 320px;
-}
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='flatpickr/flatpickr.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='tomselect/tom-select.default.min.css') }}">
 </head>
 <body>
   <nav class="navbar">
-    <a href="{{ url_for('index') }}">Εκκρεμότητες</a>
-    <a href="{{ url_for('duties') }}">Υπηρεσίες</a>
-    <a href="{{ url_for('staff') }}">Στελέχη</a>
+    <a href="{{ url_for('index') }}" class="navbar-link">Εκκρεμότητες</a>
+    <a href="{{ url_for('duties') }}" class="navbar-link is-active">Υπηρεσίες</a>
+    <a href="{{ url_for('staff') }}" class="navbar-link">Στελέχη</a>
   </nav>
-  <div class="form-section">
-    <h1>Επεξεργασία Υπηρεσίας</h1>
+  <div class="section-panel compact">
+    <h1 class="section-heading">Επεξεργασία Υπηρεσίας</h1>
     <form method="post">
       <div class="form-row">
-        <label>Ημερομηνία:</label>
-        <input type="text" class="date-picker" name="duty_date" value="{{ date_ddmmyyyy(duty.duty_date) }}" required>
+        <label for="duty_date" class="form-label">Ημερομηνία:</label>
+        <input type="text" id="duty_date" class="input-control date-picker" name="duty_date" value="{{ date_ddmmyyyy(duty.duty_date) }}" pattern="\d{2}/\d{2}/\d{4}" required lang="en-GB">
       </div>
-            <div class="form-row">
-  <label> Τιμητική; </label>
-    <input type="checkbox" name="honorary" {% if duty and duty.honorary %}checked{% endif %}>
-</div>
-<div class="form-row">
-  <label>Στέλεχος:</label>
-  <select id="staff-select" name="staff_id" required>
-    <option value="">Επιλογή στελέχους...</option>
-    {% for s in staff_list %}
-      <option value="{{ s.id }}"
-        {% if selected_staff_id == s.id %}selected{% endif %}>
-        {{ s.rank }} {{ s.name }}
-      </option>
-    {% endfor %}
-  </select>
-</div>
+      {% set current_staff_id = selected_staff_id|string %}
       <div class="form-row">
-        <label>Εγκρίθηκε;</label>
-        <input type="checkbox" name="day_off_given" {% if duty.day_off_given %}checked{% endif %}>
+        <label for="staff-select" class="form-label">Στέλεχος:</label>
+        <select id="staff-select" class="select-control" name="staff_id" required>
+          <option value="">Επιλογή στελέχους...</option>
+          {% for s in staff_list %}
+            <option value="{{ s.id }}" {% if current_staff_id == (s.id|string) %}selected{% endif %}>
+              {{ s.rank }} {{ s.name }}
+            </option>
+          {% endfor %}
+        </select>
       </div>
       <div class="form-row">
-        <label>Ημερομηνία απαλλαγής:</label>
-        <input type="text" class="date-picker" name="day_off_date" value="{{ date_ddmmyyyy(duty.day_off_date) }}">
+        <label for="honorary" class="form-label">Τιμητική;</label>
+        <input type="checkbox" id="honorary" name="honorary" {% if duty.honorary %}checked{% endif %}>
       </div>
       <div class="form-row">
-  <label>Περιγραφή:</label>
-  <textarea name="description" rows="2" style="min-width:250px;">{{ duty.description if duty else '' }}</textarea>
-</div>
-
-      <div class="btn-row">
-        <button type="submit">Αποθήκευση</button>
-        <a href="{{ url_for('duties') }}">Ακύρωση</a>
+        <label for="day_off_given" class="form-label">Εγκρίθηκε;</label>
+        <input type="checkbox" id="day_off_given" name="day_off_given" {% if duty.day_off_given %}checked{% endif %}>
+      </div>
+      <div class="form-row">
+        <label for="day_off_date" class="form-label">Ημερομηνία απαλλαγής:</label>
+        <input type="text" id="day_off_date" class="input-control date-picker" name="day_off_date" value="{{ date_ddmmyyyy(duty.day_off_date) }}" pattern="\d{2}/\d{2}/\d{4}" lang="el-GR">
+      </div>
+      <div class="form-row">
+        <label for="description" class="form-label">Περιγραφή:</label>
+        <textarea id="description" class="text-area" name="description" rows="2">{{ duty.description or '' }}</textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="button-primary">Αποθήκευση</button>
+        <a href="{{ url_for('duties') }}" class="button-secondary">Ακύρωση</a>
       </div>
     </form>
   </div>
-  <link rel="stylesheet" href="{{ url_for('static', filename='flatpickr/flatpickr.min.css') }}">
-<script src="{{ url_for('static', filename='flatpickr/flatpickr.min.js') }}"></script>
-<script src="{{ url_for('static', filename='flatpickr/gr.js') }}"></script>
-<script>
-flatpickr('.date-picker', {
-  dateFormat: "d/m/Y",
-  locale: "gr",
-  allowInput: true,
-  onClose: function(selectedDates, dateStr, instance) {
-    const pattern = /^\d{2}\/\d{2}\/\d{4}$/;
-    if (dateStr && !pattern.test(dateStr)) {
-      alert('Η ημερομηνία πρέπει να είναι μορφή ηη/μμ/εεεε');
-      instance.clear();
+
+  <script src="{{ url_for('static', filename='flatpickr/flatpickr.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='flatpickr/gr.js') }}"></script>
+  <script>
+  flatpickr('.date-picker', {
+    dateFormat: "d/m/Y",
+    locale: "gr",
+    allowInput: true,
+    onClose: function(selectedDates, dateStr, instance) {
+      const pattern = /^\d{2}\/\d{2}\/\d{4}$/;
+      if (dateStr && !pattern.test(dateStr)) {
+        alert('Η ημερομηνία πρέπει να είναι μορφή ηη/μμ/εεεε');
+        instance.clear();
+      }
     }
-  }
-});
-</script>
-<link rel="stylesheet" href="{{ url_for('static', filename='tomselect/tom-select.default.min.css') }}">
-<script src="{{ url_for('static', filename='tomselect/tom-select.complete.min.js') }}"></script>
-<script>
-new TomSelect("#staff-select", {
-    create: false,
-    sortField: {field: "text", direction: "asc"},
-    searchField: ["text"],
-    placeholder: "Αναζήτηση στελέχους…"
-});
-</script>
+  });
+  </script>
 
-
+  <script src="{{ url_for('static', filename='tomselect/tom-select.complete.min.js') }}"></script>
+  <script>
+  new TomSelect("#staff-select", {
+      create: false,
+      sortField: {field: "text", direction: "asc"},
+      searchField: ["text"],
+      placeholder: "Αναζήτηση στελέχους…"
+  });
+  </script>
 </body>
 </html>
