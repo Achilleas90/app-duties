@@ -298,10 +298,23 @@ a:hover {
   transition: background var(--transition-fast);
 }
 
+.button-primary.is-ghost {
+  background: transparent;
+  color: var(--color-slate);
+  border: 1px solid var(--color-slate);
+}
+
 .button-primary:hover,
 .button-primary:focus-visible {
   background: var(--color-navy-light);
   outline: none;
+}
+
+.button-primary.is-ghost:hover,
+.button-primary.is-ghost:focus-visible {
+  background: rgba(34, 51, 68, 0.08);
+  color: var(--color-navy-light);
+  border-color: var(--color-navy-light);
 }
 
 .button-secondary {
@@ -338,6 +351,22 @@ a:hover {
   justify-content: flex-end;
   gap: 0.75em;
   margin-top: 1.5em;
+}
+
+.form-feedback {
+  padding: 0.9em 1.1em;
+  border-radius: var(--radius-small);
+  margin-bottom: 1.3em;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.form-feedback.is-success {
+  background: var(--color-emerald-soft);
+  color: var(--color-emerald);
+  border: 1px solid rgba(0, 153, 51, 0.35);
 }
 
 .link-danger {

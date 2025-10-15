@@ -16,13 +16,18 @@
 
   <div class="section-panel compact">
     <h1 class="section-heading">Καταχώρηση νέας υπηρεσίας</h1>
+    {% if success_message %}
+      <div class="form-feedback is-success">
+        {{ success_message }}
+      </div>
+    {% endif %}
     <form action="{{ url_for('add_duty') }}" method="post">
       {% if next_url %}
         <input type="hidden" name="next" value="{{ next_url }}">
       {% endif %}
       <div class="form-row">
         <label for="duty_date" class="form-label">Ημερομηνία:</label>
-        <input type="text" id="duty_date" class="input-control date-picker" name="duty_date" pattern="\d{2}/\d{2}/\d{4}" required lang="en-GB" value="{{ request.form.get('duty_date', '') }}">
+        <input type="text" id="duty_date" class="input-control date-picker" name="duty_date" pattern="\d{2}/\d{2}/\d{4}" required lang="en-GB" value="{{ prefill_duty_date or request.form.get('duty_date', '') }}">
       </div>
       {% if selected_staff_id is defined and selected_staff_id %}
         {% set current_staff_id = selected_staff_id|string %}
@@ -58,7 +63,8 @@
       </div>
       <div class="form-actions">
         <a href="{{ next_url or url_for('duties') }}" class="button-secondary">Ακύρωση</a>
-        <button type="submit" class="button-primary">Προσθήκη</button>
+        <button type="submit" name="submit_action" value="add_another" class="button-primary is-ghost">Προσθήκη &amp; νέα καταχώρηση</button>
+        <button type="submit" name="submit_action" value="add_single" class="button-primary">Προσθήκη</button>
       </div>
     </form>
   </div>

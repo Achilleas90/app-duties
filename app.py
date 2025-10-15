@@ -122,6 +122,7 @@ def add_duty():
 
     if request.method == 'POST':
         redirect_target: Optional[str] = request.form.get('next')
+        submit_action: str = request.form.get('submit_action', 'add_single')
         duty_date_str = request.form['duty_date']
         staff_id = int(request.form['staff_id'])
         day_off_given = 'day_off_given' in request.form
@@ -144,17 +145,33 @@ def add_duty():
             description=description
         ))
         db.session.commit()
+        if submit_action == 'add_another':
+            query_arguments = {
+                'status': 'added',
+                'staff_id': str(staff_id),
+                'duty_date': duty_date_str
+            }
+            if redirect_target:
+                query_arguments['next'] = redirect_target
+            return redirect(url_for('add_duty', **query_arguments))
         if redirect_target:
             return redirect(redirect_target)
         return redirect(url_for('duties'))
 
     selected_staff_id: Optional[str] = request.args.get('staff_id')
     next_url: Optional[str] = request.args.get('next')
+    success_status: Optional[str] = request.args.get('status')
+    prefill_duty_date: Optional[str] = request.args.get('duty_date')
+    success_message: Optional[str] = None
+    if success_status == 'added':
+        success_message = 'Η υπηρεσία καταχωρήθηκε. Μπορείτε να προσθέσετε μία ακόμη.'
     return render_template(
         'add_duty.html',
         staff_list=staff_list,
         selected_staff_id=selected_staff_id,
-        next_url=next_url
+        next_url=next_url,
+        success_message=success_message,
+        prefill_duty_date=prefill_duty_date
     )
 
 # Edit duty
